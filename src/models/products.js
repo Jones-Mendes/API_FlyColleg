@@ -1,27 +1,58 @@
-const db = require("../config/database")
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-async function insertProduct(products) {
-    const { name, category, price } = products;
-   try {
-    await db.query(`
-        INSERT INTO products (name, category, price) 
-        VALUES ('$1', '$2', $3)
-        `, [name, category, price]
-    )
-        
+const Product = sequelize.define('Product', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+    },
 
-   } catch (error) {
-        throw new Error('Erro ao cadastrar produto');
-   }
-}
-async function getAllProducts() {
-        const products = await db.query('SELECT * FROM products');
-        return products.rows;
+    original_price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+    },
 
-}
-
-
-module.exports = {
-    insertProduct,
-    getAllProducts
-}
+    category_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {   
+            model: "Categories",
+            key: "id",
+        }
+    },
+    is_new: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    specifications: {
+        type: DataTypes.JSON,
+        allowNull: true,
+    },
+    shipping: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    warranty: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    return: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+});
+module.exports = Product;
